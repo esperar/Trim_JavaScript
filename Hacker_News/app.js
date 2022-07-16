@@ -13,12 +13,23 @@ function getData(url){
 
   return JSON.parse(ajax.response);
 }
+
 // newsFeed
 function newsFeed(){
   const newsFeed = getData(NEWS_URL);
   const newsList = [];
-
-  newsList.push('<ul>');
+  let template = `
+    <div class ="container mx-auto p-4">
+      <h1>Kacker News</h1>
+      <ul>
+        {{__news_feed__}}
+      </ul>
+      <div>
+        <a href ="#/page/{{__prev_page__}}">이전 페이지</a>
+        <a href ="#/page/{{__next_page__}}">다음 페이지</a>
+      </div>
+    </div>
+  `;
 
   for(let i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++){
     const div = document.createElement("div");
@@ -29,20 +40,16 @@ function newsFeed(){
       <a href = "#/show/${newsFeed[i].id}">
         ${newsFeed[i].title} (${newsFeed[i].comments_count})
       </a>
-    </li>`);
+    </li>`
+    );
   }
-
-newsList.push('</ul>');
-
-newsList.push(`
-  <div>
-    <a href = "#/page/${store.currentPage > 1 ? store.currentPage - 1 : 1}">이전 페이지</a>
-    <a href = "#/page/${store.currentPage < 3 ? store.currentPage + 1 : 3}">다음 페이지</a>
-  </div>`
-  );
+  
+  template = template.replace('{{__news_feed__}}',newsList.join(''));
+  template = template.replace('{{__prev_feed__}}',store.currentPage > 1 ? store.currentPage - 1 : 1);
+  template = template.replace('{{__next_feed__}}',store.currentPage + 1);
 
 
-container.innerHTML = newsList.join('') 
+  container.innerHTML = template;
 //배열 요소 안에 들어있는 문자열을 하나로 합침 ,로 구분한다.
 // , 로 구분하지 않도록 빈 문자열로 join을 호출한다.  
 }
